@@ -7,6 +7,8 @@ import { useState } from "react";
 import Input from "../ui/Input";
 import Button from "../ui/Button";
 import { FcGoogle } from "react-icons/fc";
+import toast from "react-hot-toast";
+import { authClient } from "@/lib/auth-client";
 
 interface LoginModalValues {
   email: string;
@@ -74,6 +76,36 @@ const LoginModal = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  const onSubmit = async (e: React.SubmitEvent) => {
+    e.preventDefault();
+
+    if (!validate()) return;
+
+    try {
+      setLoading(true);
+      const { error } = await authClient.signIn.email({
+        email: values.email,
+        password: values.password,
+      });
+
+      if (error) {
+        toast.error(error.message as string);
+      } else {
+        toast.success("Login successful");
+        closeLogin();
+      }
+      setValues(initialValues);
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Something went wrong.Try again later.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Modal title="Login" onClose={closeLogin} isOpen={isLoginOpen}>
       <div className="mb-6 space-y-1">
@@ -81,7 +113,7 @@ const LoginModal = () => {
         <p className="text-sm text-gray-500">Login into your account</p>
       </div>
 
-      <form action="" className="space-y-8">
+      <form onSubmit={onSubmit} className="space-y-8">
         <Input
           id="login-email"
           name="email"

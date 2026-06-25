@@ -7,6 +7,9 @@ import { useState } from "react";
 import Input from "../ui/Input";
 import Button from "../ui/Button";
 import { FcGoogle } from "react-icons/fc";
+import toast from "react-hot-toast";
+import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
 
 interface RegisterModalValues {
   name: string;
@@ -22,6 +25,8 @@ const RegisterModal = () => {
     (state) => state,
   );
 
+  const router = useRouter();
+
   const initialValues = {
     name: "",
     email: "",
@@ -31,6 +36,7 @@ const RegisterModal = () => {
   const [values, setValues] = useState<RegisterModalValues>(initialValues);
 
   const [loading, setLoading] = useState(false);
+
   const [errors, setErrors] = useState<RegisterErrors>({});
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -82,6 +88,39 @@ const RegisterModal = () => {
 
     return Object.keys(newErrors).length === 0;
   };
+
+  const onSubmit = async (e: React.SubmitEvent) => {
+    e.preventDefault();
+
+    if (!validate()) return;
+
+    try {
+      setLoading(true);
+      const { error } = await authClient.signUp.email({
+        name: values.name,
+        email: values.email,
+        password: values.password,
+      });
+
+      if (error) {
+        toast.error(error.message as string);
+      } else {
+        toast.success("Registration successful");
+        router.refresh();
+        closeRegister();
+      }
+      setValues(initialValues);
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Something went wrong.Try again later.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Modal title="Register" onClose={closeRegister} isOpen={isRegisterOpen}>
       <div className="mb-6 space-y-1">
@@ -89,7 +128,7 @@ const RegisterModal = () => {
         <p className="text-sm text-gray-500">Login into your account</p>
       </div>
 
-      <form action="" className="space-y-8">
+      <form onSubmit={onSubmit} action="" className="space-y-8">
         <Input
           id="login-name"
           name="name"
@@ -121,7 +160,9 @@ const RegisterModal = () => {
           Submit
         </Button>
       </form>
+
       {/* divider */}
+
       <div className="relative my-6">
         <div className="absolute inset-0 flex items-center">
           <div className="w-full border-t border-gray-300" />
@@ -130,7 +171,9 @@ const RegisterModal = () => {
           <span className="bg-white px-4 text-gray-500">or</span>
         </div>
       </div>
+
       {/* google */}
+
       <Button
         fullWidth
         icon={<FcGoogle size={22} />}
