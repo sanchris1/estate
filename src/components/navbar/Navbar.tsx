@@ -8,6 +8,8 @@ import Button from "../ui/Button";
 import { useAuthModal } from "@/store/useAuthModalStore";
 import { useStore } from "zustand";
 import { useCreatePropertyStateModal } from "@/store/useCreatePropertyModal";
+import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
 
 interface NavbarProps {
   variant: "transparent" | "solid";
@@ -17,11 +19,20 @@ export const navLinks = ["Home", "Properties", "MarketPlace"];
 
 const Navbar = ({ variant = "transparent" }: NavbarProps) => {
   const isTransparent = variant === "transparent";
+  const router = useRouter();
 
   const [isOpen, setIsOpen] = useState(false);
 
   const { openLogin } = useStore(useAuthModal, (state) => state);
   const { open } = useStore(useCreatePropertyStateModal, (state) => state);
+
+  const handleLogout = async () => {
+    await authClient.signOut();
+    router.refresh();
+  };
+
+  const { data: session, isPending } = authClient.useSession();
+
   return (
     <section
       className={`top-0 left-0 z-50 w-full  ${isTransparent ? "absolute" : "sticky border-b border-black/5 bg-card"}`}
@@ -56,12 +67,20 @@ const Navbar = ({ variant = "transparent" }: NavbarProps) => {
 
           {/* buttons */}
           <div className="hidden lg:flex items-center gap-4">
-            <Button variant="outline" onclick={openLogin}>
-              Login
-            </Button>
-            <Button variant="outline" onclick={open}>
-              Add property
-            </Button>
+            {session ? (
+              <Button variant="outline" onclick={handleLogout}>
+                Logout
+              </Button>
+            ) : (
+              <Button variant="outline" onclick={openLogin}>
+                Login
+              </Button>
+            )}
+            {!isPending && session && (
+              <Button variant="outline" onclick={open}>
+                Add property
+              </Button>
+            )}
           </div>
 
           {/* mobile menu */}
@@ -89,8 +108,14 @@ const Navbar = ({ variant = "transparent" }: NavbarProps) => {
                 </Link>
               ))}
               <div className="flex flex-col gap-3 mt-4">
-                <Button onclick={openLogin}>Login</Button>
-                <Button onclick={open}>Add property</Button>
+                {session ? (
+                  <Button onclick={handleLogout}>Logout</Button>
+                ) : (
+                  <Button onclick={openLogin}>Login</Button>
+                )}
+                {!isPending && session && (
+                  <Button onclick={open}>Add property</Button>
+                )}
               </div>
             </div>
           </div>

@@ -9,6 +9,7 @@ import Button from "../ui/Button";
 import { FcGoogle } from "react-icons/fc";
 import toast from "react-hot-toast";
 import { authClient } from "@/lib/auth-client";
+import { signInWithGoogle } from "@/services/signInWithGoogle";
 
 interface LoginModalValues {
   email: string;
@@ -151,6 +152,7 @@ const LoginModal = () => {
         icon={<FcGoogle size={22} />}
         variant="outline"
         disabled={loading}
+        onclick={signInWithGoogle}
       >
         Continue with google
       </Button>

@@ -10,6 +10,7 @@ import { FcGoogle } from "react-icons/fc";
 import toast from "react-hot-toast";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
+import { signInWithGoogle } from "@/services/signInWithGoogle";
 
 interface RegisterModalValues {
   name: string;
@@ -175,6 +176,7 @@ const RegisterModal = () => {
       {/* google */}
 
       <Button
+        onclick={signInWithGoogle}
         fullWidth
         icon={<FcGoogle size={22} />}
         variant="outline"
