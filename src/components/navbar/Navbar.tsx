@@ -7,6 +7,7 @@ import { HiOutlineMenuAlt3 } from "react-icons/hi";
 import Button from "../ui/Button";
 import { useAuthModal } from "@/store/useAuthModalStore";
 import { useStore } from "zustand";
+import { useCreatePropertyStateModal } from "@/store/useCreatePropertyModal";
 
 interface NavbarProps {
   variant: "transparent" | "solid";
@@ -20,7 +21,7 @@ const Navbar = ({ variant = "transparent" }: NavbarProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const { openLogin } = useStore(useAuthModal, (state) => state);
-
+  const { open } = useStore(useCreatePropertyStateModal, (state) => state);
   return (
     <section
       className={`top-0 left-0 z-50 w-full  ${isTransparent ? "absolute" : "sticky border-b border-black/5 bg-card"}`}
@@ -58,7 +59,9 @@ const Navbar = ({ variant = "transparent" }: NavbarProps) => {
             <Button variant="outline" onclick={openLogin}>
               Login
             </Button>
-            <Button variant="outline">Add property</Button>
+            <Button variant="outline" onclick={open}>
+              Add property
+            </Button>
           </div>
 
           {/* mobile menu */}
@@ -87,7 +90,7 @@ const Navbar = ({ variant = "transparent" }: NavbarProps) => {
               ))}
               <div className="flex flex-col gap-3 mt-4">
                 <Button onclick={openLogin}>Login</Button>
-                <Button>Add property</Button>
+                <Button onclick={open}>Add property</Button>
               </div>
             </div>
           </div>
