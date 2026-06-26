@@ -27,7 +27,7 @@ export function EmptyState({ title, subTitle, filter }: EmptyStateProps) {
         <div className="mt-8">
           <Button
             variant="outline"
-            onClick={() => router.replace("/marketplace")}
+            onclick={() => router.replace("/marketplace")}
           >
             Clear filters
           </Button>

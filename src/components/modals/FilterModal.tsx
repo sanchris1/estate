@@ -3,11 +3,12 @@
 import { useStore } from "zustand";
 import Modal from "./Modal";
 import { filterModalStore } from "@/store/useFilterModalStore";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { propertyTypes } from "@/app/constants/PropertyTypes";
 import PropertyTypeCard from "../property/PropertyTypeCard";
 import Button from "../ui/Button";
 import Input from "../ui/Input";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const STEPS = {
   TYPE: 0,
@@ -15,16 +16,20 @@ const STEPS = {
   PRICING: 2,
 };
 
-const FilterModal = () => {
+const FilterModalContent = () => {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
   const { isOpen, close } = useStore(filterModalStore, (state) => state);
 
-  const [minPrice, setMinPrice] = useState("");
-  const [maxPrice, setMaxPrice] = useState("");
+  const [minPrice, setMinPrice] = useState(searchParams.get("minPrice") ?? "");
+  const [maxPrice, setMaxPrice] = useState(searchParams.get("maxPrice") ?? "");
   const [step, setSteps] = useState(STEPS.TYPE);
-  const [listingType, setListingType] = useState<"rent" | "sale">("sale");
-  const [propertyType, setPropertyType] = useState("");
-  const [location, setLocation] = useState("");
-  const [address, setAddress] = useState("");
+  const [propertyType, setPropertyType] = useState(
+    searchParams.get("propertyType") ?? "",
+  );
+  const [location, setLocation] = useState(searchParams.get("location") ?? "");
+  const [address, setAddress] = useState(searchParams.get("address") ?? "");
 
   const stepTitle = () => {
     switch (step) {
@@ -41,7 +46,17 @@ const FilterModal = () => {
   };
 
   const applyFilter = () => {
-    console.log("chris");
+    const params = new URLSearchParams();
+
+    if (location) params.set("location", location);
+    if (address) params.set("address", address);
+    if (propertyType) params.set("propertyType", propertyType);
+    if (minPrice) params.set("minPrice", minPrice);
+    if (maxPrice) params.set("maxPrice", maxPrice);
+
+    router.replace(`/marketplace?${params.toString()}`);
+    setSteps(STEPS.TYPE);
+    close();
   };
 
   return (
@@ -134,5 +149,13 @@ const FilterModal = () => {
     </Modal>
   );
 };
+
+function FilterModal() {
+  return (
+    <Suspense>
+      <FilterModalContent />
+    </Suspense>
+  );
+}
 
 export default FilterModal;
