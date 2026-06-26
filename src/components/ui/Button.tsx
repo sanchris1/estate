@@ -38,6 +38,7 @@ const Button = ({
           className,
           "w-full": fullWidth,
           "opacity-70 cursor-not-allowed": loading || disabled,
+          props,
         },
       )}
     >
