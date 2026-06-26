@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useStore } from "zustand";
@@ -11,6 +10,9 @@ import PropertyTypeCard from "../property/PropertyTypeCard";
 import Input from "../ui/Input";
 import Counter from "../property/Counter";
 import ImageUpload from "../property/ImageUpload";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 const STEPS = {
   TYPE: 0,
@@ -26,6 +28,8 @@ const CreatePropertyModal = () => {
     useCreatePropertyStateModal,
     (state) => state,
   );
+
+  const router = useRouter();
 
   const [step, setSteps] = useState(STEPS.TYPE);
   const [loading, setLoading] = useState(false);
@@ -50,11 +54,6 @@ const CreatePropertyModal = () => {
     }
   };
 
-  //create listing
-  async function createListing() {
-    console.log("sam");
-  }
-
   const [propertyType, setPropertyType] = useState("");
 
   const [location, setLocation] = useState("");
@@ -77,6 +76,64 @@ const CreatePropertyModal = () => {
   const handleChange = (file: File) => {
     setImage(file);
     setPreview(URL.createObjectURL(file));
+  };
+
+  //create listing
+  async function createListing() {
+    try {
+      setLoading(true);
+
+      const formData = new FormData();
+
+      formData.append("title", title);
+      formData.append("price", price);
+      formData.append("description", description);
+      formData.append("propertyType", propertyType);
+      formData.append("listingType", listingType);
+      formData.append("bathrooms", bathrooms.toString());
+      formData.append("bedrooms", bedrooms.toString());
+      formData.append("parkingSpaces", parkingSpaces.toString());
+      formData.append("location", location);
+      formData.append("area", area);
+      formData.append("address", address);
+      if (image) {
+        formData.append("image", image);
+      }
+
+      await axios.post("/api/properties", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      toast.success("Property created successfully");
+      router.push("/properties");
+
+      handleClose();
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data.error || "Something went wrong");
+        return;
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const handleClose = () => {
+    setAddress("");
+    setArea("");
+    setBathrooms(1);
+    setBedrooms(1);
+    setDescription("");
+    setImage(null);
+    setListingType("rent");
+    setLocation("");
+    setParkingSpaces(1);
+    setPreview(null);
+    setPrice("");
+    setPropertyType("");
+    close();
   };
 
   return (

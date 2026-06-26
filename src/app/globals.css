@@ -8,7 +8,7 @@
   --color-text: #111827;
 }
 
-.no-scrollbar::webkit-scrollbar {
+.no-scrollbar::-webkit-scrollbar {
   display: none;
 }
 
