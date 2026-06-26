@@ -100,7 +100,7 @@ const Navbar = ({ variant = "transparent" }: NavbarProps) => {
               {" "}
               {navLinks.map((item) => (
                 <Link
-                  href={item === "Home" ? "/" : `${item.toLowerCase()}`}
+                  href={item === "Home" ? "/" : `/${item.toLowerCase()}`}
                   key={item}
                   className={`${isTransparent ? "text-white/80" : "text-text/70"}  transition hover:text-primary`}
                 >
