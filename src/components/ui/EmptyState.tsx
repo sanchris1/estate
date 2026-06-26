@@ -1,3 +1,5 @@
+"use client";
+
 import { useRouter } from "next/navigation";
 import { HiOutlineHomeModern } from "react-icons/hi2";
 import Button from "./Button";
