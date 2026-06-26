@@ -3,11 +3,13 @@ export interface Property {
   title: string;
   location: string;
   price: number;
-  type: string;
+  propertyType: string;
   bedrooms: number;
   bathrooms: number;
-  area: number;
+  area: number | null;
   image: string;
-  description?: string;
-  status: string;
+  description: string;
+  listingType: string;
+  parkingSpaces: number;
+  ownerId: string;
 }
